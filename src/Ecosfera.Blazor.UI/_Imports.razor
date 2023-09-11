@@ -1,0 +1,47 @@
+@using System.Net.Http
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.Extensions.Localization
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.JSInterop
+@using Ecosfera.Blazor.UI
+@using Ecosfera.Blazor.UI.Shared
+@using MudBlazor
+@using BlazorTime
+@using MediatR
+@using Fluxor
+@using AutoMapper
+@using Ecosfera.Blazor.UI.Components.Shared
+@using Ecosfera.Blazor.UI.Components.Shared.Themes
+@using Ecosfera.Blazor.UI.Models.Localization
+@using FluentValidation;
+@using EcosferaBlazor.Auth.Domain
+@using EcosferaBlazor.Auth.Domain.Enums;
+@using EcosferaBlazor.Auth.Domain.Identity
+@using EcosferaBlazor.Auth.Application.Features.Fluxor;
+@using EcosferaBlazor.Auth.Application.Constants.Permission;
+@using EcosferaBlazor.Auth.Application.Common.Extensions
+@using EcosferaBlazor.Auth.Application.Constants
+@using EcosferaBlazor.Auth.Application.Common.Interfaces
+@using EcosferaBlazor.Auth.Application.Common.Models
+@using EcosferaBlazor.Auth.Infrastructure.Extensions
+@using EcosferaBlazor.Auth.Infrastructure.Constants
+@using Ecosfera.Blazor.UI.Components.Common
+@using Ecosfera.Blazor.UI.Components.Dialogs
+@using Ecosfera.Blazor.UI.Pages.Authentication
+@using EcosferaBlazor.Auth.Application.Common.Configurations
+@using MudExtensions
+@using MudExtensions.Enums
+@inject DashboardSettings Settings
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject IConfiguration Config
+@inject IAuthorizationService AuthService 
+
+@attribute [Authorize]
