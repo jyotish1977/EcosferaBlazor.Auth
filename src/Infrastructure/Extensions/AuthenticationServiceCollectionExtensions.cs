@@ -108,6 +108,12 @@ public static class AuthenticationServiceCollectionExtensions
                      facebookOptions.AppId = "580628277601844";
                      facebookOptions.AppSecret = "9f59b1fe7bb830065f71b7982410022d";
                      facebookOptions.CallbackPath = new PathString("/signin-facebook");
+                 })
+                 .AddTwitter(twitterOptions=>
+                 {
+                     twitterOptions.ConsumerKey = "H1d6u5btuvlC6ScUsKLbmV2pf";
+                     twitterOptions.ConsumerSecret = "b39BHeSTW5PwTAq3TVr08CdfX44bSoT48qT2xU7jj2TL5bkbeI";
+                     twitterOptions.CallbackPath = new PathString("/signin-twitter");
                  }); 
    
         services.AddScoped<AccessTokenProvider>();
