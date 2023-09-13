@@ -178,12 +178,6 @@ public class Testing
 
         return await context.Set<TEntity>().CountAsync();
     }
-
-    public static IPicklistService CreatePicklistService()
-    {
-        var scope = _scopeFactory.CreateScope();
-        return scope.ServiceProvider.GetRequiredService<IPicklistService>();
-    }
     public static ITenantService CreateTenantsService()
     {
         var scope = _scopeFactory.CreateScope();
