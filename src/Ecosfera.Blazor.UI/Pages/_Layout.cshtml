@@ -129,10 +129,11 @@
                 await loginWithGoogle(provider, dotNetHelper);
             } else if (provider == 'Facebook') {
                 await loginWithFacebook(provider, dotNetHelper);
+            } else if (provider == 'Twitter') {
+                await loginWithTwitter(provider, dotNetHelper);
             }
         }
-        async function loginWithMicrosoft(provider, dotNetHelper) { 
-            debugger;
+        async function loginWithMicrosoft(provider, dotNetHelper) {
             const msalConfig = {
                 auth: {
                     clientId: '6c7d1d55-1e88-41e8-b1d4-865c8f6bc30e',
@@ -163,9 +164,8 @@
                 }
             });
             client.requestAccessToken();
-        } 
+        }
         async function loginWithFacebook(provider, dotNetHelper) {
-            debugger;
             FB.login(function (response) {
                 if (response.authResponse) {
                     const accessToken = response.authResponse.accessToken;
@@ -187,7 +187,67 @@
                 }
             }, { scope: 'email' }); // Specify the required permissions/scope
         }
+        async function loginWithTwitter(provider, dotNetHelper) {
+            debugger;
+            const consumerKey = 'H1d6u5btuvlC6ScUsKLbmV2pf'; // Replace with your Twitter Developer App consumer key
+            const consumerSecret = 'b39BHeSTW5PwTAq3TVr08CdfX44bSoT48qT2xU7jj2TL5bkbeI'; // Replace with your Twitter Developer App consumer secret
+
+            try {
+                // Step 1: Request a request token from Twitter
+                const response = await fetch('/twitter-authentication/request-token', {
+                    method: 'POST',
+                });
+
+                if (response.ok) {
+                    const { oauth_token, oauth_token_secret } = await response.json();
+
+                    // Step 2: Redirect the user to Twitter for authorization
+                    const twitterAuthUrl = `https://api.twitter.com/oauth/authenticate?oauth_token=${oauth_token}`;
+                    window.location.href = twitterAuthUrl;
+
+                    // After the user authorizes the app on Twitter and is redirected back to your callback URL:
+
+                    // Step 3: Get the verifier from the query string of the callback URL
+                    const queryParams = new URLSearchParams(window.location.search);
+                    const oauthVerifier = queryParams.get('oauth_verifier');
+
+                    if (!oauthVerifier) {
+                        console.error('OAuth verifier missing in the callback URL.');
+                        return;
+                    }
+
+                    // Step 4: Exchange the request token and verifier for an access token
+                    const accessTokenResponse = await fetch('/twitter-authentication/access-token', {
+                        method: 'POST',
+                        body: JSON.stringify({ oauth_token, oauth_verifier, consumerKey, consumerSecret }),
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    if (accessTokenResponse.ok) {
+                        const accessTokenData = await accessTokenResponse.json();
+                        const userId = accessTokenData.user_id;
+                        const screenName = accessTokenData.screen_name;
+
+                        // Call a Blazor method with the retrieved data
+                        await dotNetHelper.invokeMethodAsync('ConfirmExternal', provider, screenName, '', userId);
+                        console.log('Login with Twitter success');
+                        localStorage.setItem('twitter_client_token', accessTokenData.oauth_token);
+                    } else {
+                        console.error('Failed to exchange request token for access token.');
+                    }
+                } else {
+                    console.error('Failed to request a request token from Twitter.');
+                }
+            } catch (error) {
+                console.error('Login with Twitter error', error);
+            }
+        }
+
+
         async function externalLogout() {
+            debugger;
             let client_token = localStorage.getItem('microsoft_client_token');
             if (client_token) {
                 const client = new msal.PublicClientApplication(msalConfig);
@@ -251,17 +311,17 @@
                         const color = '#FFFFFF';
                         const imageDiffVert = 25 + 2;
                         return `
-                                <div style='width:${d.width}px;height:${d.height}px;padding-top:${imageDiffVert - 2}px;padding-left:1px;padding-right:1px'>
-                                        <div style="font-family: 'Inter', sans-serif;background-color:${color};  margin-left:-1px;width:${d.width - 2}px;height:${d.height - imageDiffVert}px;border-radius:10px;border: 1px solid #E4E2E9">
-                                                    <div style="display:flex;justify-content:flex-end;margin-top:5px;margin-right:8px">#${d.data.id.slice(-3)}</div>
-                                            <div style="background-color:${color};margin-top:${-imageDiffVert - 20}px;margin-left:${15}px;border-radius:100px;width:50px;height:50px;" ></div>
-                                            <div style="margin-top:${-imageDiffVert - 20}px;">   <img src=" ${d.data.profileUrl}" style="margin-left:${20}px;border-radius:100px;width:40px;height:40px;" /></div>
-                                            <div style="font-size:15px;color:#08011E;margin-left:20px;margin-top:10px">  ${d.data.name} </div>
-                                                    <div style="color:#716E7B;margin-left:20px;margin-top:3px;font-size:10px;"> ${d.data.positionName} </div>
+                                        <div style='width:${d.width}px;height:${d.height}px;padding-top:${imageDiffVert - 2}px;padding-left:1px;padding-right:1px'>
+                                                <div style="font-family: 'Inter', sans-serif;background-color:${color};  margin-left:-1px;width:${d.width - 2}px;height:${d.height - imageDiffVert}px;border-radius:10px;border: 1px solid #E4E2E9">
+                                                            <div style="display:flex;justify-content:flex-end;margin-top:5px;margin-right:8px">#${d.data.id.slice(-3)}</div>
+                                                    <div style="background-color:${color};margin-top:${-imageDiffVert - 20}px;margin-left:${15}px;border-radius:100px;width:50px;height:50px;" ></div>
+                                                    <div style="margin-top:${-imageDiffVert - 20}px;">   <img src=" ${d.data.profileUrl}" style="margin-left:${20}px;border-radius:100px;width:40px;height:40px;" /></div>
+                                                    <div style="font-size:15px;color:#08011E;margin-left:20px;margin-top:10px">  ${d.data.name} </div>
+                                                            <div style="color:#716E7B;margin-left:20px;margin-top:3px;font-size:10px;"> ${d.data.positionName} </div>
 
-                                        </div>
-                                    </div>
-                                            `;
+                                                </div>
+                                            </div>
+                                                    `;
                     })
                     .container('.chart-container')
                     .data(orgdata)
